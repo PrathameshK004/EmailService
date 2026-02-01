@@ -16,6 +16,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   signup: (username: string, email: string, password: string) => Promise<void>
   logout: () => void
+  requestEmailOTP: (email: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -71,11 +72,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(data.error || "Signup failed")
     }
 
-    localStorage.setItem("token", data.token)
-    localStorage.setItem("user", JSON.stringify(data.user))
-    setToken(data.token)
-    setUser(data.user)
-    router.push("/dashboard")
+    // Request OTP for email verification
+    try {
+      await requestEmailOTP(email)
+      // Redirect to email verification page
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+    } catch (err) {
+      // If OTP request fails, still complete signup
+      localStorage.setItem("token", data.token)
+      localStorage.setItem("user", JSON.stringify(data.user))
+      setToken(data.token)
+      setUser(data.user)
+      router.push("/dashboard")
+    }
+  }
+
+  const requestEmailOTP = async (email: string) => {
+    const response = await fetch("/api/otp/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, type: "signup" }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to send OTP")
+    }
   }
 
   const logout = () => {
@@ -87,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, signup, logout, requestEmailOTP }}>
       {children}
     </AuthContext.Provider>
   )

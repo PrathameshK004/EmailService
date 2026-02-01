@@ -40,6 +40,8 @@ export default function SignupPage() {
     setIsLoading(true)
     try {
       await signup(username, email, password)
+      // After successful signup, redirect to email verification
+      // The signup function will redirect to dashboard, but we'll catch and redirect to verify-email instead
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed")
     } finally {
