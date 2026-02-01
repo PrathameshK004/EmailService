@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   Card,
   CardContent,
@@ -13,7 +14,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { InputOTP } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import Link from "next/link";
 import { Mail, Lock, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -285,43 +290,17 @@ export default function ForgotPasswordPage() {
                   <InputOTP
                     maxLength={4}
                     value={otp}
-                    onChange={setOtp}
-                    render={({ slots }) => (
-                      <div className="flex gap-2">
-                        {slots.map((slot, index) => {
-                          // Destructure all internal props you don't want on the DOM
-                          const {
-                            char,
-                            onChange,
-                            isActive,
-                            hasFakeCaret,
-                            placeholderChar,
-                            ...rest
-                          } = slot;
-
-                          return (
-                            <input
-                              key={index}
-                              {...rest} // only valid DOM props
-                              value={char ?? ""} // controlled value
-                              onChange={(e) => {
-                                // Allow only numeric input
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  onChange(e);
-                                }
-                              }}
-                              type="text"
-                              inputMode="numeric"
-                              pattern="\d*"
-                              maxLength={1} // each input is one digit
-                              className="h-12 w-12 rounded-lg border border-input bg-background text-center text-lg font-semibold"
-                            />
-                          );
-                        })}
-                      </div>
-                    )}
-                  />
+                    onChange={(value) => {
+                      if (/^\d*$/.test(value)) setOtp(value);
+                    }}
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                    </InputOTPGroup>
+                  </InputOTP>
                 </div>
                 <div className="text-center">
                   {timer > 0 ? (
