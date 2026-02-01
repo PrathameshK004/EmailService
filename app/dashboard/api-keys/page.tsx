@@ -325,7 +325,7 @@ function ApiKeysContent() {
           </p>
           <pre className="rounded-lg bg-muted p-4 overflow-x-auto">
             <code className="text-sm">
-{`curl -X POST https://your-deployed-url.vercel.app/api/send-email \\
+{`curl -X POST https://email-service-delta-seven.vercel.app/api/send-email \\
   -H "Authorization: Bearer ms_your_api_key_here" \\
   -H "Content-Type: application/json" \\
   -d '{
