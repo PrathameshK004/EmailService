@@ -34,17 +34,36 @@ export default function VerifyEmailClient() {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const email = searchParams.get("email");
+    const status = searchParams.get("status");
+
     if (!email) {
       router.push("/signup");
+      return;
     }
-  }, [email, router]);
+
+    if (status === "true") {
+      setSuccess(`Email sent to ${email}`);
+      handleStartTimer();
+    } else if (status === "false") {
+      setSuccess(
+        "Verify your Email by entering OTP or get a new OTP with Resend OTP",
+      );
+    }
+  }, [router]);
+
+  let timerInterval: NodeJS.Timeout;
 
   const handleStartTimer = () => {
+    if (timerInterval) clearInterval(timerInterval);
+
     setTimer(60);
-    const interval = setInterval(() => {
+
+    timerInterval = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
-          clearInterval(interval);
+          clearInterval(timerInterval);
           return 0;
         }
         return prev - 1;
@@ -76,7 +95,6 @@ export default function VerifyEmailClient() {
         throw new Error(data.error || "Failed to verify OTP");
       }
 
-      setSuccess("Email verified successfully!");
       setIsVerified(true);
       setTimeout(() => {
         router.push("/login");
@@ -223,7 +241,7 @@ export default function VerifyEmailClient() {
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              {isLoading ? "Verifying..." : "Verify Email"}
+              {isLoading ? "Processing..." : "Verify Email"}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">

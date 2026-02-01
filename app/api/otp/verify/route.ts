@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
 
     const { db } = await connectToDatabase()
     const otpCollection = db.collection("otp_attempts")
+    const usersCollection = db.collection("users")
 
     // Find OTP record
     const otpRecord = await otpCollection.findOne({
@@ -70,6 +71,14 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase(),
       type,
     })
+
+    // If signup type, mark email as verified in user document
+    if (type === "signup") {
+      await usersCollection.updateOne(
+        { email: email.toLowerCase() },
+        { $set: { isEmailVerified: true } }
+      )
+    }
 
     return NextResponse.json({
       message: "OTP verified successfully",
