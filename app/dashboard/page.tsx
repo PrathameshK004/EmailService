@@ -1,83 +1,93 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { useAuth } from "@/contexts/auth-context"
-import { ProtectedRoute } from "@/components/protected-route"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { Mail, Server, Send, Key, CheckCircle, XCircle, Loader2, ExternalLink } from "lucide-react"
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { ProtectedRoute } from "@/components/protected-route";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import {
+  Mail,
+  Server,
+  Send,
+  Key,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  ExternalLink,
+} from "lucide-react";
 
 interface SmtpCredential {
-  _id: string
-  name: string
-  host: string
-  port: number
-  isDefault: boolean
+  _id: string;
+  name: string;
+  host: string;
+  port: number;
+  isDefault: boolean;
 }
 
 interface ApiKey {
-  _id: string
-  name: string
-  keyPreview: string
-  lastUsedAt: string | null
+  _id: string;
+  name: string;
+  keyPreview: string;
+  lastUsedAt: string | null;
 }
 
 function DashboardContent() {
-  const { user, token } = useAuth()
-  const [smtpConfigs, setSmtpConfigs] = useState<SmtpCredential[]>([])
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
-  const [isLoadingSmtp, setIsLoadingSmtp] = useState(true)
-  const [isLoadingKeys, setIsLoadingKeys] = useState(true)
+  const { user, token } = useAuth();
+  const [smtpConfigs, setSmtpConfigs] = useState<SmtpCredential[]>([]);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [isLoadingSmtp, setIsLoadingSmtp] = useState(true);
+  const [isLoadingKeys, setIsLoadingKeys] = useState(true);
 
   const fetchSmtpConfigs = useCallback(async () => {
-  try {
-    const response = await fetch("/api/smtp", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-
-    const data = await response.json()
+    try {
+      const response = await fetch("/api/smtp", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      console.log("SMTP API response:", data);
 
       if (response.ok) {
-        const normalized = Array.isArray(data)
-          ? data
-          : data
-          ? [data]
-          : []
-
-        setSmtpConfigs(normalized)
+        // Wrap the credentials object into an array so .map works
+        const normalized = data.credentials ? [data.credentials] : [];
+        setSmtpConfigs(normalized);
       }
     } catch (error) {
-      console.error("Error fetching SMTP configs:", error)
+      console.error("Error fetching SMTP configs:", error);
     } finally {
-      setIsLoadingSmtp(false)
+      setIsLoadingSmtp(false);
     }
-  }, [token])
-
+  }, [token]);
 
   const fetchApiKeys = useCallback(async () => {
     try {
       const response = await fetch("/api/api-keys", {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (response.ok) {
-        setApiKeys(data.apiKeys || [])
+        setApiKeys(data.apiKeys || []);
       }
     } catch (error) {
-      console.error("Error fetching API keys:", error)
+      console.error("Error fetching API keys:", error);
     } finally {
-      setIsLoadingKeys(false)
+      setIsLoadingKeys(false);
     }
-  }, [token])
+  }, [token]);
 
   useEffect(() => {
     if (token) {
-      fetchSmtpConfigs()
-      fetchApiKeys()
+      fetchSmtpConfigs();
+      fetchApiKeys();
     }
-  }, [token, fetchSmtpConfigs, fetchApiKeys])
+  }, [token, fetchSmtpConfigs, fetchApiKeys]);
 
   const quickActions = [
     {
@@ -101,7 +111,7 @@ function DashboardContent() {
       href: "/dashboard/api-keys",
       color: "bg-orange-500",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -118,7 +128,9 @@ function DashboardContent() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Account Status</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Account Status
+            </CardTitle>
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -154,7 +166,9 @@ function DashboardContent() {
               <>
                 <div className="text-2xl font-bold">{smtpConfigs.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  {smtpConfigs.length === 0 ? "No SMTP configured" : "Active configurations"}
+                  {smtpConfigs.length === 0
+                    ? "No SMTP configured"
+                    : "Active configurations"}
                 </p>
               </>
             )}
@@ -173,7 +187,9 @@ function DashboardContent() {
               <>
                 <div className="text-2xl font-bold">{apiKeys.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  {apiKeys.length === 0 ? "No API keys created" : "Active API keys"}
+                  {apiKeys.length === 0
+                    ? "No API keys created"
+                    : "Active API keys"}
                 </p>
               </>
             )}
@@ -206,16 +222,18 @@ function DashboardContent() {
           ) : smtpConfigs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <XCircle className="h-10 w-10 text-muted-foreground/50 mb-2" />
-              <p className="text-muted-foreground">No SMTP connections configured</p>
+              <p className="text-muted-foreground">
+                No SMTP connections configured
+              </p>
               <Button asChild variant="link" className="mt-2">
                 <Link href="/dashboard/smtp">Configure SMTP Settings</Link>
               </Button>
             </div>
           ) : (
             <div className="space-y-3">
-              {smtpConfigs.map((config) => (
+              {smtpConfigs.map((config, index) => (
                 <div
-                  key={config._id}
+                  key={config.user + index} // Use email + index as unique key
                   className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div className="flex items-center gap-3">
@@ -223,15 +241,12 @@ function DashboardContent() {
                       <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                     </div>
                     <div>
-                      <p className="font-medium">{config.name}</p>
+                      <p className="font-medium">{config.user}</p>
                       <p className="text-sm text-muted-foreground">
                         {config.host}:{config.port}
                       </p>
                     </div>
                   </div>
-                  {config.isDefault && (
-                    <Badge variant="secondary">Default</Badge>
-                  )}
                 </div>
               ))}
             </div>
@@ -334,19 +349,29 @@ function DashboardContent() {
         <CardContent>
           <ol className="list-inside list-decimal space-y-3 text-sm">
             <li className="text-muted-foreground">
-              <span className="font-medium text-foreground">Configure SMTP Settings</span>
-              {" - "}Add your email provider&apos;s SMTP credentials (Gmail, SendGrid, etc.)
+              <span className="font-medium text-foreground">
+                Configure SMTP Settings
+              </span>
+              {" - "}Add your email provider&apos;s SMTP credentials (Gmail,
+              SendGrid, etc.)
             </li>
             <li className="text-muted-foreground">
-              <span className="font-medium text-foreground">Create an API Key</span>
+              <span className="font-medium text-foreground">
+                Create an API Key
+              </span>
               {" - "}Go to API Keys and generate a new key for your project
             </li>
             <li className="text-muted-foreground">
-              <span className="font-medium text-foreground">Deploy This Service</span>
-              {" - "}Click &quot;Publish&quot; to deploy to Vercel and get your production URL
+              <span className="font-medium text-foreground">
+                Deploy This Service
+              </span>
+              {" - "}Click &quot;Publish&quot; to deploy to Vercel and get your
+              production URL
             </li>
             <li className="text-muted-foreground">
-              <span className="font-medium text-foreground">Integrate in Your Project</span>
+              <span className="font-medium text-foreground">
+                Integrate in Your Project
+              </span>
               {" - "}Use the API endpoint with your key to send emails
             </li>
           </ol>
@@ -367,7 +392,7 @@ function DashboardContent() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 export default function DashboardPage() {
@@ -375,5 +400,5 @@ export default function DashboardPage() {
     <ProtectedRoute>
       <DashboardContent />
     </ProtectedRoute>
-  )
+  );
 }

@@ -353,7 +353,7 @@ const response = await fetch("${baseUrl}/api/send-email", {
                 <Badge variant="secondary">GET</Badge>
                 <Badge variant="default">POST</Badge>
                 <Badge variant="outline">PUT</Badge>
-                <Badge variant="destructive">DELETE</Badge>
+                <Badge variant="destructive" className="text-white">DELETE</Badge>
                 <code className="text-sm font-mono">/api/smtp</code>
               </div>
               <p className="text-sm text-muted-foreground mb-3">Manage SMTP configurations (requires auth)</p>
@@ -524,27 +524,27 @@ const response = await fetch("${baseUrl}/api/send-email", {
               </thead>
               <tbody>
                 <tr className="border-b">
-                  <td className="py-3 px-4"><Badge variant="destructive">400</Badge></td>
+                  <td className="py-3 px-4"><Badge variant="destructive" className="text-white">400</Badge></td>
                   <td className="py-3 px-4">Bad Request</td>
                   <td className="py-3 px-4 text-muted-foreground">Missing or invalid request parameters</td>
                 </tr>
                 <tr className="border-b">
-                  <td className="py-3 px-4"><Badge variant="destructive">401</Badge></td>
+                  <td className="py-3 px-4"><Badge variant="destructive" className="text-white">401</Badge></td>
                   <td className="py-3 px-4">Unauthorized</td>
                   <td className="py-3 px-4 text-muted-foreground">Missing or invalid JWT token</td>
                 </tr>
                 <tr className="border-b">
-                  <td className="py-3 px-4"><Badge variant="destructive">404</Badge></td>
+                  <td className="py-3 px-4"><Badge variant="destructive" className="text-white">404</Badge></td>
                   <td className="py-3 px-4">Not Found</td>
                   <td className="py-3 px-4 text-muted-foreground">Resource not found (e.g., SMTP config)</td>
                 </tr>
                 <tr className="border-b">
-                  <td className="py-3 px-4"><Badge variant="destructive">409</Badge></td>
+                  <td className="py-3 px-4"><Badge variant="destructive" className="text-white">409</Badge></td>
                   <td className="py-3 px-4">Conflict</td>
                   <td className="py-3 px-4 text-muted-foreground">Resource already exists (e.g., email taken)</td>
                 </tr>
                 <tr>
-                  <td className="py-3 px-4"><Badge variant="destructive">500</Badge></td>
+                  <td className="py-3 px-4"><Badge variant="destructive" className="text-white">500</Badge></td>
                   <td className="py-3 px-4">Server Error</td>
                   <td className="py-3 px-4 text-muted-foreground">Internal server error or SMTP failure</td>
                 </tr>
