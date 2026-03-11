@@ -863,7 +863,7 @@ For issues, questions, or suggestions:
 
 1. **Open an Issue** - GitHub Issues for bug reports
 2. **Discussions** - GitHub Discussions for questions
-3. **Email** - Contact: support@emailservice.com
+3. **Email** - Contact: noreply.mailsend.emailservice@gmail.com
 4. **Documentation** - Check README and code comments
 
 ---
