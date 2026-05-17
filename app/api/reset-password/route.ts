@@ -33,11 +33,8 @@ export async function POST(request: NextRequest) {
     // Find user
     const user = await usersCollection.findOne({ email: email.toLowerCase() });
 
-    if (!user || !user.isEmailVerified) {
-      return NextResponse.json(
-        { error: "User not found or email not verified" },
-        { status: 404 },
-      );
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Hash new password
