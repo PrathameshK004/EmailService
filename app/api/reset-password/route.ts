@@ -1,47 +1,47 @@
-import { NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongodb"
-import bcrypt from "bcryptjs"
+import { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, confirmPassword } = await request.json()
+    const { email, password, confirmPassword } = await request.json();
 
     if (!email || !password || !confirmPassword) {
       return NextResponse.json(
         { error: "Email, password, and confirm password are required" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     if (password !== confirmPassword) {
       return NextResponse.json(
         { error: "Passwords do not match" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
         { error: "Password must be at least 6 characters" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
-    const { db } = await connectToDatabase()
-    const usersCollection = db.collection("users")
+    const { db } = await connectToDatabase();
+    const usersCollection = db.collection("users");
 
     // Find user
-    const user = await usersCollection.findOne({ email: email.toLowerCase() })
+    const user = await usersCollection.findOne({ email: email.toLowerCase() });
 
-    if (!user) {
+    if (!user || !user.isEmailVerified) {
       return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      )
+        { error: "User not found or email not verified" },
+        { status: 404 },
+      );
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Update password
     await usersCollection.updateOne(
@@ -51,17 +51,17 @@ export async function POST(request: NextRequest) {
           password: hashedPassword,
           passwordChangedAt: new Date(),
         },
-      }
-    )
+      },
+    );
 
     return NextResponse.json({
       message: "Password reset successfully",
-    })
+    });
   } catch (error) {
-    console.error("Reset password error:", error)
+    console.error("Reset password error:", error);
     return NextResponse.json(
       { error: "Failed to reset password" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
