@@ -28,7 +28,16 @@ export async function POST(request: NextRequest) {
       $or: [{ email: email.toLowerCase() }, { username }],
     });
 
-    if (existingUser && !existingUser.isEmailVerified) {
+    if (existingUser) {
+      // If already verified, block duplicate signup
+      if (existingUser.isEmailVerified) {
+        return NextResponse.json(
+          { error: "User already exists" },
+          { status: 409 },
+        );
+      }
+
+      // If not verified, redirect to verification
       return NextResponse.json(
         {
           redirectToVerify: true,
